@@ -1,6 +1,6 @@
 #!/bin/bash
 ###############################################################################
-# SCRIPT: setup-20g-sfp-backbone.sh
+# SCRIPT: debian-netwerk-config.sh
 # OMSCHRIJVING: Configureert een 20 Gbps LACP Bond op Debian (Mellanox ConnectX-2).
 #
 # HARDWARE VEREISTEN:
