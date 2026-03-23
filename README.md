@@ -1,4 +1,4 @@
-# 🚀 LDP Open Source Productiestraat
+# 🚀 PLD (Provisioning Linux Desktops)
 
 ![Status](https://img.shields.io/badge/Status-Operational-brightgreen?style=for-the-badge&logo=statuspage)
 ![OS](https://img.shields.io/badge/Host-Debian_12-red?style=for-the-badge&logo=debian)
@@ -8,7 +8,7 @@
 
 ### "Zero-Touch" Provisioning voor Linux Fat Clients
 
-Deze repository bevat de centrale intelligentie voor je Linux-vloot. Door gebruik te maken van PXE-boot en Ansible-GitOps, gedragen fysieke Fat Clients zich als "LDP Targets": ze streamen hun configuratie live vanaf deze server en herstellen zichzelf bij elke herstart.
+Deze repository bevat de centrale intelligentie voor je Linux-vloot. Door gebruik te maken van PXE-boot en Ansible-GitOps, gedragen fysieke Fat Clients zich als "PLD Targets": ze streamen hun configuratie live vanaf deze server en herstellen zichzelf bij elke herstart.
 
 ---
 
@@ -17,7 +17,7 @@ Deze repository bevat de centrale intelligentie voor je Linux-vloot. Door gebrui
 Elke computer die opstart, bouwt zijn systeem modulair op. Dit voorkomt dubbel werk en zorgt voor een consistente gebruikerservaring.
 
 1.  **De OS-Laag (Distro A)**: De basisinstallatie (Debian, Ubuntu, Fedora) via netwerk-bootstrapping.
-2.  **De Hygiëne-Laag (L1)**: Basisconfiguratie, gebruikersbeheer en de "PVS-reset" (opschonen van tijdelijke data).
+2.  **De Hygiëne-Laag (L1)**: Basisconfiguratie, gebruikersbeheer en de "PLD-reset" (opschonen van tijdelijke data).
 3.  **De Hardware-Laag (L2)**: Automatische detectie en installatie van GPU-drivers (NVIDIA/AMD) en CPU-firmware.
 4.  **De Interface-Laag (Desktop B)**: De grafische schil (Gnome, XFCE of KDE).
 5.  **De Applicatie-Laag (Functie C)**: De specifieke software-set voor de eindgebruiker (Office, DevOps, Educatie).
@@ -58,4 +58,4 @@ Omdat de server headless is, gebruik je de volgende bronnen voor overzicht:
 
 ---
 
-> **LDP-Filosofie**: "Build once, deploy everywhere." Lokale wijzigingen op de Fat Client zijn tijdelijk; de waarheid ligt altijd in deze Git-repository.
+> **PLD-Filosofie**: "Build once, deploy everywhere." Lokale wijzigingen op de Fat Client zijn tijdelijk; de waarheid ligt altijd in deze Git-repository.
