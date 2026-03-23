@@ -12,7 +12,7 @@ Deze repository bevat de centrale intelligentie voor je Linux-vloot. Door gebrui
 
 ---
 
-## 🏗️ De Gelaagde Architectuur (De "vDisk")
+## 🏗️ De Gelaagde Architectuur
 
 Elke computer die opstart, bouwt zijn systeem modulair op. Dit voorkomt dubbel werk en zorgt voor een consistente gebruikerservaring.
 
