@@ -1,3 +1,5 @@
+# D-Link DGS-1510-52 setup / config
+#
 # De "Paperclip Executie" Stappen:
 # Zoek het gaatje: Aan de voorkant zit een 
 # klein gaatje met de tekst "Reset".
