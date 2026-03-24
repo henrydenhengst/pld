@@ -98,6 +98,7 @@ Je beheert de hele **"fabriek"** vanaf je laptop via Git.
 ```bash
 git add .
 git commit
+git push
 ```
 
 ### Server bijwerken
