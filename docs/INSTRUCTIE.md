@@ -28,7 +28,7 @@ git clone https://github.com/henrydenhengst/pld.git ~/git/pld
 4. Voer het installatiescript uit:
 
 ```bash
-cd ~/pld  
+cd ~/git/pld  
 sudo ./install-pld-server.sh
 ```
 
@@ -87,7 +87,7 @@ git commit
 ### Server bijwerken
 
 ```bash
-cd ~/pld && git pull && sudo ansible-playbook playbooks/server.yml
+cd ~/git/pld && git pull && sudo ansible-playbook playbooks/server.yml
 ```
 
 ### Opschonen
