@@ -1,0 +1,29 @@
+---
+- name: "STAP 1: Inventariseer alle fysieke netwerkinterfaces"
+  set_fact:
+    physical_nics: "{{ ansible_interfaces | select('match', '^(eth|enp|eno|em|p[0-9]p|sfp)') | list }}"
+
+- name: "STAP 2: Filter op ethernet type (geen WiFi/Virtual)"
+  set_fact:
+    valid_ethernet_nics: []
+  loop: "{{ physical_nics }}"
+  when: 
+    - hostvars[inventory_hostname]['ansible_' + (item | replace('-', '_'))]['type'] | default('') == 'ether'
+  set_fact:
+    valid_ethernet_nics: "{{ valid_ethernet_nics + [item] }}"
+
+- name: "STAP 3: Harde controle op minimaal 2 fysieke kaarten"
+  ansible.builtin.assert:
+    that:
+      - valid_ethernet_nics | length >= 2
+    fail_msg: "FOUT: Onvoldoende fysieke netwerkkaarten gevonden! Wi-Fi is uitgesloten."
+
+- name: "STAP 4: Carrier check (Zit de kabel/module erin?)"
+  ansible.builtin.assert:
+    that:
+      - hostvars[inventory_hostname]['ansible_' + (item | replace('-', '_'))]['active'] == true
+    fail_msg: "FOUT: Interface {{ item }} heeft geen actieve link. Controleer de kabel."
+  loop: "{{ valid_ethernet_nics }}"
+  loop_control:
+    index_var: idx
+  when: idx < 2

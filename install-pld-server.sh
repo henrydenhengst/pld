@@ -1,45 +1,24 @@
-#!/usr/bin/env bash
-# =================================================================
-# PLD SERVER INSTALLATION SCRIPT v1.0
-# Doel: Een kale Debian server transformeren naar PLD Moederschip
-# =================================================================
+#!/bin/bash
+
+# PLD Server Installatie Script
+# Dit script bereidt de server voor en start de Ansible configuratie.
+
 set -e
 
-# Kleuren voor output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+echo "--- Starten van PLD Server Installatie ---"
 
-echo -e "${BLUE}🚀 Starten van PLD Server Installatie...${NC}"
+# 1. Update systeem en installeer basis benodigdheden
+echo "Stap 1: Systeem update en basis pakketten installeren..."
+sudo apt update && sudo apt install -y git ansible python3-pip
 
-# 1. Systeem updaten en basisbenodigdheden installeren
-echo -e "${BLUE}📦 1. Installeren van Ansible en Git...${NC}"
-sudo apt update
-sudo apt install -y git ansible curl
+# 2. Installeer benodigde Ansible collecties (nodig voor nmcli/netwerk)
+echo "Stap 2: Ansible collecties installeren..."
+ansible-galaxy collection install community.general ansible.posix
 
-# 2. Project ophalen van GitHub
-echo -e "${BLUE}📥 2. Project ophalen van GitHub...${NC}"
-PROJECT_DIR="$HOME/git/pld"
+# 3. Uitvoeren van het hoofd-playbook
+echo "Stap 3: Starten van de Ansible configuratie (Netwerk & Software)..."
+# We gebruiken localhost omdat we op de server zelf draaien
+sudo ansible-playbook -i "localhost," -c local playbooks/server.yml
 
-if [ -d "$PROJECT_DIR" ]; then
-    echo "Directory bestaat al, ophalen nieuwste wijzigingen..."
-    cd "$PROJECT_DIR"
-    git pull
-else
-    git clone https://github.com/henrydenhengst/pld.git "$PROJECT_DIR"
-    cd "$PROJECT_DIR"
-fi
-
-# 3. Ansible Server Playbook draaien
-echo -e "${BLUE}⚙️  3. Ansible Playbook uitvoeren (Server Rol)...${NC}"
-# We draaien het server-specifieke playbook dat we eerder hebben gemaakt
-sudo ansible-playbook playbooks/server.yml
-
-# 4. Status Check
-echo -e "${GREEN}✅ INSTALLATIE VOLTOOID!${NC}"
-echo "-------------------------------------------------------"
-echo -e "🐳 Docker Status: $(systemctl is-active docker)"
-echo -e "⚡ Apt-Cacher Status: $(systemctl is-active apt-cacher-ng || echo 'Niet actief/geïnstalleerd')"
-echo -e "📂 Project locatie: $PROJECT_DIR"
-echo "-------------------------------------------------------"
-echo "Je kunt nu desktops gaan aansluiten op de DGS-3100 switch."
+echo "--- Installatie Voltooid! ---"
+echo "De server is nu geconfigureerd als Gateway op 192.168.100.1"

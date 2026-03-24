@@ -1,0 +1,23 @@
+---
+# We importeren eerst de hardware check voordat we gaan configureren
+- import_tasks: validate_hardware.yml
+
+- name: "NIC 1: Zorg dat de internetverbinding op DHCP staat"
+  community.general.nmcli:
+    conn_name: "PLD-Internet"
+    ifname: "{{ valid_ethernet_nics[0] }}"
+    type: ethernet
+    ipv4_method: auto
+    state: present
+
+- name: "NIC 2: Configureer vast IP-adres voor Linux uitrol"
+  community.general.nmcli:
+    conn_name: "PLD-Installatie"
+    ifname: "{{ valid_ethernet_nics[1] }}"
+    type: ethernet
+    ipv4_address: "192.168.100.1/24"
+    ipv4_method: manual
+    state: present
+
+- name: "Herstart netwerkinterface voor de installatie-straat"
+  ansible.builtin.shell: "nmcli connection up PLD-Installatie"

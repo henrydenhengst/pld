@@ -1,7 +1,8 @@
 ---
-- hosts: localhost
-  connection: local
+- name: Richt de PLD Server in
+  hosts: all
   become: yes
   roles:
-    - common
-    - server
+    - network       # Eerst hardware check en IP-configuratie
+    - apt_proxy     # Daarna de caching proxy installeren
+    - docker        # Optioneel: Docker voor extra tools
