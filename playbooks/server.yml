@@ -3,6 +3,6 @@
   hosts: all
   become: yes
   roles:
-    - network       # Eerst hardware check en IP-configuratie
-    - apt_proxy     # Daarna de caching proxy installeren
-    - docker        # Optioneel: Docker voor extra tools
+    - network       # Hardware check & IP 192.168.100.1
+    - dhcp          # Deelt adressen uit in 192.168.100.x
+    - apt_proxy     # Cache voor de pakketten

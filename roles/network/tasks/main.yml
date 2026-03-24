@@ -1,7 +1,8 @@
 ---
-# We importeren eerst de hardware check voordat we gaan configureren
+# 1. Hardware validatie (SFP/Ethernet check)
 - import_tasks: validate_hardware.yml
 
+# 2. IP Configuratie
 - name: "NIC 1: Zorg dat de internetverbinding op DHCP staat"
   community.general.nmcli:
     conn_name: "PLD-Internet"
@@ -21,3 +22,6 @@
 
 - name: "Herstart netwerkinterface voor de installatie-straat"
   ansible.builtin.shell: "nmcli connection up PLD-Installatie"
+
+# 3. Routering en NAT (De sluis openzetten)
+- import_tasks: routing.yml

@@ -1,0 +1,29 @@
+---
+- name: Schakel IP Forwarding in de kernel in
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1)
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Installeer nftables voor NAT (modern alternatief voor iptables)
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+
+- name: Configureer NAT (Masquerading) van NIC 2 naar NIC 1
+  ansible.builtin.shell: |
+    nft add table ip nat
+    nft add chain ip nat postrouting { type nat hook postrouting priority 100 \; }
+    nft add rule ip nat postrouting oifname "{{ valid_ethernet_nics[0] }}" masquerade
+  become: yes
+
+- name: Zorg dat de firewall regels bij herstart blijven bestaan
+  ansible.builtin.shell: "nft list ruleset > /etc/nftables.conf"
+
+- name: Start en activeer nftables service
+  ansible.builtin.service:
+    name: nftables
+    state: started
+    enabled: yes

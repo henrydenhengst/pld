@@ -1,0 +1,5 @@
+---
+- name: Herstart DHCP server
+  ansible.builtin.service:
+    name: isc-dhcp-server
+    state: restarted
