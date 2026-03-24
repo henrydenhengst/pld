@@ -37,7 +37,7 @@ Heb je een beheersbare (managed) switch? Volg dan deze stappen voor de beste res
 ---
 
 ## VISUEEL SCHEMA (ASCII ART)
-
+```
    [ INTERNET / ROUTER ]
             |
             | (Kantoor Netwerk)
@@ -55,7 +55,7 @@ Heb je een beheersbare (managed) switch? Volg dan deze stappen voor de beste res
     +---+---+---+---+
         |   |   |
     [ LINUX DESKTOPS ] (Ontvangen IP van PLD Server)
-
+```
 ---
 
 ## SAMENVATTING
