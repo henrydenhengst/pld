@@ -1,16 +1,26 @@
 ---
-- name: Privacy Browser & Messenger Repos
-  shell: |
-    curl -fsSL https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/brave-browser.gpg --yes
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/brave-browser.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" > /etc/apt/sources.list.d/brave-browser.list
-    wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" > /etc/apt/sources.list.d/signal-desktop.list
-
-- name: Privacy Apps (APT)
+- name: Installeer Privacy Tools
   apt:
-    name: [brave-browser, signal-desktop, briar, torbrowser-launcher, keepassxc, vlc]
-    update_cache: yes
+    name: [ufw, torbrowser-launcher, oniontools, bleachbit, keepassxc, lynis]
     state: present
 
-- name: Extra Privacy App (Flatpak Session)
-  shell: flatpak install -y flathub network.loki.Session
+- name: Configureer Firewall (UFW)
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+
+- name: Hardening - Verwijder telemetry
+  apt:
+    name: [popularity-contest, reportbug]
+    state: absent
+
+- name: Voer Lynis Security Scan uit
+  shell: lynis audit system --quick
+  register: lynis_result
+  ignore_errors: yes
+
+- name: Sla Lynis rapport lokaal op
+  copy:
+    content: "{{ lynis_result.stdout }}"
+    dest: "/var/log/lynis-report-{{ ansible_date_time.date }}.log"

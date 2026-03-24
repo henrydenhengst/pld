@@ -1,22 +1,36 @@
 ---
-- name: Lokalisatie & Tijd
-  shell: |
-    timedatectl set-timezone Europe/Amsterdam
-    localectl set-x11-keymap us pc105 intl
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
 
-- name: Core Systeem Apps
-  package:
-    name: [thunderbird, thunderbird-l10n-nl, cups, hplip, sane-utils, avahi-daemon, printer-driver-brlaser, libavcodec-extra]
+- name: Installeer basis systeemtools
+  apt:
+    name: [curl, wget, git, htop, net-tools, p7zip-full, vim]
     state: present
 
-- name: Flatpak Engine & Store Support
-  package:
-    name: [flatpak, gnome-software-plugin-flatpak]
+- name: Automatische Hardware Detectie - Microcode
+  apt:
+    name: "{{ 'intel-microcode' if ansible_processor[1] is search('Intel') else 'amd64-microcode' }}"
     state: present
 
-- name: Flathub Repo Toevoegen
-  shell: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+- name: Check voor Nvidia GPU
+  shell: lspci | grep -i nvidia
+  register: nvidia_check
+  ignore_errors: yes
+  changed_when: false
 
-- name: Start Services
-  systemd: { name: "{{ item }}", state: started, enabled: yes }
-  loop: [cups, avahi-daemon]
+- name: Installeer Nvidia drivers indien nodig
+  apt:
+    name: nvidia-driver
+    state: present
+  when: nvidia_check.rc == 0
+
+- name: Installeer Standaard Kantoor Software
+  apt:
+    name: [libreoffice, libreoffice-l10n-nl, vlc, firefox-esr, thunderbird]
+    state: present
+
+- name: Systeeminstellingen (Tijd & Taal)
+  timezone:
+    name: Europe/Amsterdam

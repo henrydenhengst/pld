@@ -1,3 +1,4 @@
+cat <<'EOF' > update_pld.sh
 #!/usr/bin/env bash
 # PLD Project Master Update v2.0
 set -e
@@ -95,3 +96,8 @@ git commit -m "Full Refactor: Common en Privacy rollen met hardware detectie en 
 git push origin main
 
 echo "✅ KLAAR! Je '6-per-uur' fabriek is nu 100% up-to-date op GitHub."
+EOF
+
+# Maak het script uitvoerbaar en draai het
+chmod +x update_pld.sh
+./update_pld.sh
