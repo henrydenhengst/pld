@@ -1,0 +1,5 @@
+- name: Configureer PLD Desktop
+  hosts: localhost
+  roles:
+    - common
+    - "{{ pld_profile }}" # Dit wordt 'office', 'dev', 'gaming', etc.

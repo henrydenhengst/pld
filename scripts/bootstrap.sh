@@ -1,35 +1,42 @@
 #!/bin/bash
 
-# PLD Client Bootstrap Script
-# Dit script wordt uitgevoerd op de nieuwe Linux desktops.
+# =================================================================
+# PLD CLIENT BOOTSTRAP SCRIPT
+# Gebruik: curl -s http://192.168.100.1/bootstrap.sh | bash -s [profiel]
+# =================================================================
 
 set -e
 
+# 1. Variabelen & Argumenten
 GATEWAY_IP="192.168.100.1"
+PROFIEL=${1:-office} # Standaard naar 'office' als er geen argument is
 
-echo "--- Starten van PLD Client Configuratie ---"
+echo "--- 🚀 PLD Bootstrap gestart (Profiel: $PROFIEL) ---"
 
-# 1. Controleer of we de server kunnen bereiken
-echo "Stap 1: Verbinding met PLD-server controleren..."
-if ping -c 1 $GATEWAY_IP &> /dev/null; then
-    echo "✅ PLD-server gevonden op $GATEWAY_IP"
-else
-    echo "❌ FOUT: PLD-server onbereikbaar. Controleer de netwerkkabel."
+# 2. Netwerk Check
+if ! ping -c 1 $GATEWAY_IP &> /dev/null; then
+    echo "❌ FOUT: Kan de PLD-server ($GATEWAY_IP) niet bereiken."
     exit 1
 fi
 
-# 2. Stel de APT Proxy in (Apt-Cacher-NG op de server)
-# Dit zorgt ervoor dat updates via de server lopen en gecached worden.
-echo "Stap 2: Apt-Proxy configureren voor supersnelle downloads..."
+# 3. Configureer Apt-Proxy (Voor de snelheid)
+echo "Stap 1: Apt-Proxy instellen via de sluis..."
 echo "Acquire::http::Proxy \"http://$GATEWAY_IP:3142\";" | sudo tee /etc/apt/apt.conf.d/01proxy
 
-# 3. Systeem update via de proxy
-echo "Stap 3: Systeem updaten via de sluis..."
+# 4. Installeer Ansible op de Client
+echo "Stap 2: Lokale tools installeren..."
 sudo apt update
+sudo apt install -y ansible git
 
-# 4. Installeer basispakketten die we altijd nodig hebben
-echo "Stap 4: Standaard software installeren..."
-sudo apt install -y curl git openssh-server
+# 5. Haal de volledige configuratie op van de server
+echo "Stap 3: Git-repo binnenhalen voor lokale uitvoering..."
+rm -rf ~/pld-config
+git clone http://$GATEWAY_IP/pld.git ~/pld-config
 
-echo "--- Client Configuratie Voltooid! ---"
-echo "Deze desktop is nu verbonden met de PLD-straat en gebruikt de lokale cache."
+# 6. Voer de Ansible-magie uit op basis van het gekozen profiel
+echo "Stap 4: Ansible Playbook starten voor profiel: $PROFIEL..."
+cd ~/pld-config
+sudo ansible-playbook -i "localhost," -c local playbooks/desktop.yml --extra-vars "pld_profile=$PROFIEL"
+
+echo "--- ✅ PLD Installatie Voltooid! ---"
+echo "Herstart de machine om alle wijzigingen te activeren."

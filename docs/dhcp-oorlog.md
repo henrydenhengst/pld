@@ -23,16 +23,21 @@ In deze opstelling doet de PLD-server drie belangrijke dingen op de tweede netwe
 
 1. IP-adressen uitdelen: De server is de enige "baas" (DHCP-server) in de installatie-straat.
 2. Doorsturen: De server staat ingesteld om internetverkeer van de desktops "door te sluizen" via de eerste kaart.
-3. Vertalen: De server vertaalt het verkeer (NAT) zodat de Linux desktops updates kunnen ophalen van het internet.
+3. Vertalen: De server gebruikt IP-Forwarding en IP-Masquerading (NAT) via de `routing.yml` rol.
 
 ---
 
-## 3. DE SWITCH VOORBEREIDEN (CISCO / MANAGED SWITCH)
+---
+
+## 3. DE SWITCH VOORBEREIDEN (MANAGED SWITCH)
 
 Heb je een beheersbare (managed) switch? Volg dan deze stappen voor de beste resultaten:
 
-* Fabrieksinstellingen: Reset de switch naar de standaardwaarden (bij Cisco vaak via de 'write erase' of de fysieke reset-knop) om oude VLAN-instellingen te wissen.
-* Poortsnelheid: Zorg dat de poorten op "Spanning Tree PortFast" (Cisco) of "Edge Port" (HP/Dell) staan. Dit zorgt ervoor dat de Linux desktops direct een IP-adres krijgen zodra ze opstarten, zonder dat de switch eerst 30 seconden de poort blokkeert.
+* **Stap A: Schone Start (Reset):** Wis oude instellingen op de switch (bijv. via de fysieke reset-knop of `write erase` bij Cisco). Dit voorkomt dat oude VLAN-configuraties het verkeer blokkeren.
+
+* **Stap B: Optimalisatie (PortFast):** Configureer **Spanning Tree PortFast** (Cisco) of **Edge Port** (HP/Dell) op alle poorten waar de desktops aan hangen. Dit zorgt dat een poort direct "live" gaat zodra de desktop aangaat.
+
+* **Het Voordeel:** De Linux desktops krijgen direct een IP-adres bij het opstarten, zonder dat de switch eerst 30 seconden de poort blokkeert om netwerklussen te zoeken.
 
 ---
 
