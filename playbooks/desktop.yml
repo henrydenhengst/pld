@@ -1,5 +1,24 @@
-- name: Configureer PLD Desktop
+---
+- name: "PLD Desktop Installatie via Sluis"
   hosts: localhost
+  connection: local
+  become: yes
+
   roles:
-    - common
-    - "{{ pld_profile }}" # Dit wordt 'office', 'dev', 'gaming', etc.
+    - selector    # Vraagt eerst om het profiel
+    - common      # Installeert de basis (BTRFS/Proxy)
+
+  tasks:
+    - name: "Inladen van het gekozen profiel"
+      ansible.builtin.include_role:
+        name: "{{ item.role }}"
+      when: pld_profile == item.id
+      loop:
+        - { id: "1", role: "office" }
+        - { id: "2", role: "privacy" }
+        - { id: "3", role: "dev" }
+        - { id: "4", role: "gaming" }
+
+    - name: "Bevestiging van voltooiing"
+      ansible.builtin.debug:
+        msg: "Systeem is succesvol ingericht als profiel {{ pld_profile }} via het Sluis-Model."

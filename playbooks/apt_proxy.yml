@@ -1,0 +1,39 @@
+---
+- name: Configureer de Apt-Proxy (Turbomotor)
+  hosts: localhost
+  become: yes
+  vars:
+    proxy_port: 3142
+    cache_dir: "/var/cache/apt-cacher-ng"
+
+  tasks:
+    - name: Installeer Apt-Cacher-NG
+      ansible.builtin.apt:
+        name: apt-cacher-ng
+        state: present
+
+    - name: Optimaliseer Cache instellingen
+      ansible.builtin.lineinfile:
+        path: /etc/apt-cacher-ng/acng.conf
+        regexp: "^CacheDir:"
+        line: "CacheDir: {{ cache_dir }}"
+
+    - name: Open de poort in de configuratie
+      ansible.builtin.lineinfile:
+        path: /etc/apt-cacher-ng/acng.conf
+        regexp: "^Port:"
+        line: "Port: {{ proxy_port }}"
+
+    - name: Zorg dat de cache map de juiste rechten heeft
+      ansible.builtin.file:
+        path: "{{ cache_dir }}"
+        state: directory
+        owner: apt-cacher-ng
+        group: apt-cacher-ng
+        mode: '0755'
+
+    - name: Start en activeer de Proxy service
+      ansible.builtin.service:
+        name: apt-cacher-ng
+        state: restarted
+        enabled: yes

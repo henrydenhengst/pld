@@ -1,0 +1,36 @@
+---
+- name: Configureer IP Forwarding en NAT (De Sluis)
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Activeer IPv4 Forwarding in de kernel
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: Installeer nftables voor NAT-beheer
+      ansible.builtin.apt:
+        name: nftables
+        state: present
+
+    - name: Configureer Masquerading (NAT) op de internet-interface
+      ansible.builtin.shell: |
+        nft add table ip nat
+        nft add chain ip nat postrouting { type nat hook postrouting priority 100 \; }
+        nft add rule ip nat postrouting oifname "{{ internet_interface }}" masquerade
+      vars:
+        internet_interface: "eth0" # VERVANG DIT door jouw internet-NIC (bijv. enp1s0)
+      changed_when: false
+
+    - name: Zorg dat nftables-regels herstarten overleven
+      ansible.builtin.shell: nft list ruleset > /etc/nftables.conf
+      changed_when: false
+
+    - name: Start en activeer nftables service
+      ansible.builtin.service:
+        name: nftables
+        state: started
+        enabled: yes

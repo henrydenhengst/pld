@@ -1,13 +1,10 @@
 ---
-- name: Chrome & Signal Repos
-  shell: |
-    curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg --yes
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-    wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > /usr/share/keyrings/signal-desktop-keyring.gpg
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main" > /etc/apt/sources.list.d/signal-desktop.list
-
-- name: Office Stack Installeren
-  apt:
-    name: [google-chrome-stable, signal-desktop, libreoffice, libreoffice-l10n-nl]
-    update_cache: yes
+- name: "Office: Installeer Productiviteitstools"
+  ansible.builtin.apt:
+    name:
+      - libreoffice
+      - libreoffice-l10n-nl
+      - vlc
+      - thunderbird
+      - firefox-esr
     state: present

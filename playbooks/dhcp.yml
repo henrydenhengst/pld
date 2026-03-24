@@ -1,0 +1,41 @@
+---
+- name: Configureer de DHCP Server (IP-uitgifte)
+  hosts: localhost
+  become: yes
+  vars:
+    install_interface: "enp2s0" # PAS DIT AAN: De kaart die aan de switch hangt
+    subnet: "192.168.100.0"
+    netmask: "255.255.255.0"
+    range_start: "192.168.100.50"
+    range_end: "192.168.100.250"
+    gateway: "192.168.100.1"
+
+  tasks:
+    - name: Installeer ISC DHCP Server
+      ansible.builtin.apt:
+        name: isc-dhcp-server
+        state: present
+
+    - name: Koppel DHCP aan de juiste netwerkkaart
+      ansible.builtin.lineinfile:
+        path: /etc/default/isc-dhcp-server
+        regexp: '^INTERFACESv4='
+        line: 'INTERFACESv4="{{ install_interface }}"'
+
+    - name: Genereer de dhcpd.conf configuratie
+      ansible.builtin.blockinfile:
+        path: /etc/dhcp/dhcpd.conf
+        block: |
+          subnet {{ subnet }} netmask {{ netmask }} {
+            range {{ range_start }} {{ range_end }};
+            option routers {{ gateway }};
+            option domain-name-servers 8.8.8.8, 1.1.1.1;
+            default-lease-time 600;
+            max-lease-time 7200;
+          }
+
+    - name: Herstart DHCP service
+      ansible.builtin.service:
+        name: isc-dhcp-server
+        state: restarted
+        enabled: yes

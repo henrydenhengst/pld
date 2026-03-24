@@ -1,0 +1,20 @@
+---
+- name: "Sluis: Activeer IPv4 Forwarding in de kernel"
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    state: present
+    reload: yes
+
+- name: "Sluis: Configureer NAT (Masquerade) op de externe interface"
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: "{{ ansible_default_ipv4.interface }}"
+    jump: MASQUERADE
+
+- name: "Sluis: Sta verkeer toe van intern naar extern"
+  ansible.builtin.iptables:
+    chain: FORWARD
+    in_interface: "{{ internal_iface }}"
+    jump: ACCEPT

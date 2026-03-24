@@ -1,0 +1,27 @@
+---
+- name: "SLUIS-PROMPT: Kies een profiel"
+  ansible.builtin.pause:
+    seconds: 20
+    prompt: |
+      =========================================
+      PLD INSTALLATIE-MENU (SLUIS-MODEL v2.0)
+      =========================================
+      Maak een keuze binnen 20 seconden:
+      
+      1. OFFICE  (Standaard)
+      2. PRIVACY (High Security)
+      3. DEV     (Docker/Dev)
+      4. GAMING  (Drivers/Steam)
+      
+      Geen keuze? Dan wordt het automatisch 1 (OFFICE).
+  register: user_choice_result
+
+- name: "Zet profiel op basis van input of default"
+  ansible.builtin.set_fact:
+    pld_profile: "{{ user_choice_result.user_input | default('1') }}"
+
+- name: "Sla keuze op in /etc/pld_profile"
+  ansible.builtin.copy:
+    dest: /etc/pld_profile
+    content: "SELECTED_PROFILE={{ pld_profile }}"
+    mode: '0644'

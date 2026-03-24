@@ -1,41 +1,21 @@
 ---
-- name: Update apt cache
-  apt:
+- name: "Standaard: Configureer Apt-Proxy naar Sluis"
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/01proxy
+    content: 'Acquire::http::Proxy "http://192.168.100.1:3142";'
+
+- name: "Standaard: Installeer BTRFS-tools en basispakketten"
+  ansible.builtin.apt:
+    name:
+      - btrfs-progs
+      - ufw
+      - curl
+      - htop
+    state: present
     update_cache: yes
-    cache_valid_time: 3600
 
-- name: Installeer basis systeemtools
-  apt:
-    name: [curl, wget, git, htop, net-tools, p7zip-full, vim]
-    state: present
-
-- name: Automatische Hardware Detectie - Microcode
-  apt:
-    name: "{{ 'intel-microcode' if ansible_processor[1] is search('Intel') else 'amd64-microcode' }}"
-    state: present
-
-- name: Check voor Nvidia GPU
-  shell: lspci | grep -i nvidia
-  register: nvidia_check
-  ignore_errors: yes
-  changed_when: false
-
-- name: Installeer Nvidia drivers indien nodig
-  apt:
-    name: nvidia-driver
-    state: present
-  when: nvidia_check.rc == 0
-
-- name: Installeer Standaard Kantoor Software
-  apt:
-    name: [libreoffice, libreoffice-l10n-nl, vlc, firefox-esr, thunderbird]
-    state: present
-
-- name: Systeeminstellingen (Tijd & Taal)
-  timezone:
-    name: Europe/Amsterdam
-
-- name: Configureer de desktop om de Apt-Cache van de server te gebruiken
-  copy:
-    dest: /etc/apt/apt.conf.d/00aptproxy
-    content: 'Acquire::http::Proxy "http://{{ hostvars[groups["server"][0]]["ansible_default_ipv4"]["address"] }}:3142";'
+- name: "Standaard: Activeer Firewall"
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming

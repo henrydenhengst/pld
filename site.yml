@@ -1,0 +1,17 @@
+---
+- name: "PLD Moederschip: Sluis & Netboot Setup"
+  hosts: localhost
+  connection: local
+  become: yes
+
+  vars:
+    internal_iface: "eth1"  # Pas dit aan naar je tweede NIC
+    internal_ip: "192.168.100.1"
+    dhcp_range_start: "192.168.100.10"
+    dhcp_range_end: "192.168.100.200"
+
+  roles:
+    - server_common    # Basis tools & updates
+    - sluis_routing    # NAT, Forwarding & IPTables
+    - apt_proxy        # Apt-Cacher-NG op poort 3142
+    - pxe_netboot      # TFTP, Syslinux & Preseed (BTRFS)

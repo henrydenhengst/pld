@@ -1,0 +1,60 @@
+# 1. Lokalisatie (Geen vragen over taal/tijd)
+d-i debian-installer/locale string nl_NL
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/xkb-keymap select us
+d-i clock-setup/utc boolean true
+d-i time/zone string Europe/Amsterdam
+
+# 2. Netwerk (Auto-config via de Sluis)
+d-i netcfg/get_hostname string pld-client
+d-i netcfg/get_domain string local
+d-i netcfg/choose_interface select auto
+d-i netcfg/wireless_wep string
+
+# 3. Mirror & Proxy (Snelheid via Moederschip)
+d-i mirror/country string manual
+d-i mirror/http/hostname string deb.debian.org
+d-i mirror/http/directory string /debian
+d-i mirror/http/proxy string http://{{ internal_ip }}:3142/
+
+# 4. Partitionering (GEFORCEERD BTRFS - GEEN VRAGEN)
+d-i partman-auto/method string regular
+d-i partman-auto/choose_recipe select pld-btrfs
+d-i partman-auto/expert_recipe string                         \
+      pld-btrfs ::                                            \
+              512 512 512 fat32                               \
+                      $primary{ }                             \
+                      method{ efi } format{ }                 \
+              .                                               \
+              2000 10000 1000000 btrfs                        \
+                      $primary{ }                             \
+                      method{ btrfs } format{ }               \
+                      use_filesystem{ } filesystem{ btrfs }   \
+                      mountpoint{ / }                         \
+              .
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# 5. Gebruiker (Standaard wachtwoord: pld2026)
+d-i passwd/user-fullname string PLD Admin
+d-i passwd/username string pldadmin
+d-i passwd/user-password password pld2026
+d-i passwd/user-password-again password pld2026
+d-i user-setup/allow-password-weak boolean true
+
+# 6. Bootloader (Installeer GRUB zonder te vragen waar)
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean true
+d-i grub-installer/bootdev string default
+
+# 7. Afronding (Herstart direct als het klaar is)
+d-i finish-install/reboot_in_progress note
+d-i pkgsel/include string openssh-server wget btrfs-progs ansible
+
+# 8. HET ONTSTEKINGSMECHANISME (Activeert Ansible na de installatie)
+d-i preseed/late_command string \
+    in-target wget -O /tmp/bootstrap.sh http://{{ internal_ip }}/bootstrap.sh; \
+    in-target chmod +x /tmp/bootstrap.sh; \
+    in-target /tmp/bootstrap.sh

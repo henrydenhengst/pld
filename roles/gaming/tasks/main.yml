@@ -1,0 +1,22 @@
+---
+- name: "Gaming: Activeer i386 Architectuur"
+  ansible.builtin.command: dpkg --add-architecture i386
+  changed_when: false
+
+- name: "Gaming: Installeer Steam, Wine en Vulkan"
+  ansible.builtin.apt:
+    name:
+      - steam
+      - wine
+      - wine32
+      - mesa-vulkan-drivers
+      - mesa-vulkan-drivers:i386
+    state: present
+    update_cache: yes
+
+- name: "Gaming: Verhoog NoFile limits voor Esync/Proton"
+  ansible.builtin.pam_limits:
+    domain: "*"
+    limit_type: "-"
+    limit_item: nofile
+    value: 1048576

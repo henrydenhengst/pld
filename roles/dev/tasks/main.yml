@@ -1,0 +1,22 @@
+---
+- name: "Dev: Installeer Docker en Build-tools"
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose
+      - build-essential
+      - git
+      - python3-venv
+    state: present
+
+- name: "Dev: VS Code Repository toevoegen en installeren"
+  ansible.builtin.shell: |
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/keyrings/packages.microsoft.gpg
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list
+  args:
+    creates: /etc/apt/sources.list.d/vscode.list
+
+- name: "Dev: Update cache en installeer VS Code"
+  ansible.builtin.apt:
+    name: code
+    update_cache: yes

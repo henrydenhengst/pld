@@ -1,0 +1,39 @@
+---
+- name: Configureer de Interne Webserver (Script Delivery)
+  hosts: localhost
+  become: yes
+  vars:
+    web_root: "/var/www/html"
+    script_source: "../scripts/bootstrap.sh"
+
+  tasks:
+    - name: Installeer Nginx Lightweight
+      ansible.builtin.apt:
+        name: nginx-light
+        state: present
+
+    - name: Verwijder standaard Nginx index pagina
+      ansible.builtin.file:
+        path: "{{ web_root }}/index.html"
+        state: absent
+
+    - name: Publiceer het bootstrap script naar de webroot
+      ansible.builtin.copy:
+        src: "{{ script_source }}"
+        dest: "{{ web_root }}/bootstrap.sh"
+        mode: '0755'
+        owner: www-data
+        group: www-data
+
+    - name: Optimaliseer Nginx voor lokaal netwerkverkeer
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Controleer of het script bereikbaar is (lokaal)
+      ansible.builtin.uri:
+        url: "http://localhost/bootstrap.sh"
+        return_content: no
+      register: web_check
+      failed_when: web_check.status != 200

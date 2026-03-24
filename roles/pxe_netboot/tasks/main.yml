@@ -1,0 +1,23 @@
+---
+- name: "PXE: Installeer TFTP en Netboot benodigdheden"
+  ansible.builtin.apt:
+    name:
+      - tftpd-hpa
+      - syslinux-common
+      - nginx
+    state: present
+
+- name: "PXE: Kopieer Bootloader bestanden"
+  ansible.builtin.copy:
+    src: "/usr/lib/syslinux/modules/bios/{{ item }}"
+    dest: "/srv/tftp/{{ item }}"
+    remote_src: yes
+  loop:
+    - ldlinux.c32
+    - menu.c32
+    - libutil.c32
+
+- name: "PXE: Genereer het BTRFS-Preseed bestand in de webmap"
+  ansible.builtin.template:
+    src: preseed.cfg.j2
+    dest: /var/www/html/preseed.cfg
