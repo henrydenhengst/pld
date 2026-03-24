@@ -21,7 +21,7 @@ sudo apt update && sudo apt install -y git ansible
 3. Haal je project binnen van GitHub:
 
 ```bash
-git clone https://github.com/henrydenhengst/pld.git ~/pld
+git clone https://github.com/henrydenhengst/pld.git ~/git/pld
 ```
 
 
@@ -80,6 +80,7 @@ Je beheert de hele **"fabriek"** vanaf je laptop via Git.
 ### Synchroniseren
 
 ```bash
+git add .
 git commit
 ```
 
